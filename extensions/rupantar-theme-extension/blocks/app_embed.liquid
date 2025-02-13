@@ -1,18 +1,8 @@
-<div style="position: fixed; right: -35px; top: 50%; transform: rotate(-90deg) translateY(-50%); z-index: 1000;">
-  <!-- Side Button -->
-  <button id="virtualTryOnButton" style="
-    background-color: #000000;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    transition: all 0.3s ease;
-  ">
-    Virtual Try On
-  </button>
+<div style="position: fixed; bottom: 0; right: 0">
+  <!-- Clickable area: the thumbs-up image -->  
+  <div id="clickableEmbed" style="cursor: pointer;">
+    {{ "thumbs-up.png" | asset_url | image_tag }}
+  </div>
 </div>
 
 <!-- Modal Overlay -->
