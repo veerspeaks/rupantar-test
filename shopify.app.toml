@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "70dc7ae1f1a272a634c850b1729c0503"
-application_url = "https://hq-unsigned-protecting-conferences.trycloudflare.com"
+application_url = "https://frames-examination-mixed-shall.trycloudflare.com"
 embedded = true
 name = "rupantar-test-app"
 handle = "rupantar-test-app"
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://hq-unsigned-protecting-conferences.trycloudflare.com/auth/callback",
-  "https://hq-unsigned-protecting-conferences.trycloudflare.com/auth/shopify/callback",
-  "https://hq-unsigned-protecting-conferences.trycloudflare.com/api/auth/callback"
+  "https://frames-examination-mixed-shall.trycloudflare.com/auth/callback",
+  "https://frames-examination-mixed-shall.trycloudflare.com/auth/shopify/callback",
+  "https://frames-examination-mixed-shall.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
