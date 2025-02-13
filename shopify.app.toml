@@ -1,0 +1,36 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "70dc7ae1f1a272a634c850b1729c0503"
+application_url = "https://ment-marathon-pure-meals.trycloudflare.com"
+embedded = true
+name = "rupantar-test-app"
+handle = "rupantar-test-app"
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2025-01"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://ment-marathon-pure-meals.trycloudflare.com/auth/callback",
+  "https://ment-marathon-pure-meals.trycloudflare.com/auth/shopify/callback",
+  "https://ment-marathon-pure-meals.trycloudflare.com/api/auth/callback"
+]
+
+[pos]
+embedded = true
