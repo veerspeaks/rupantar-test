@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "70dc7ae1f1a272a634c850b1729c0503"
-application_url = "https://ment-marathon-pure-meals.trycloudflare.com"
+application_url = "https://studios-avoiding-blame-secretary.trycloudflare.com"
 embedded = true
 name = "rupantar-test-app"
 handle = "rupantar-test-app"
@@ -27,9 +27,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://ment-marathon-pure-meals.trycloudflare.com/auth/callback",
-  "https://ment-marathon-pure-meals.trycloudflare.com/auth/shopify/callback",
-  "https://ment-marathon-pure-meals.trycloudflare.com/api/auth/callback"
+  "https://studios-avoiding-blame-secretary.trycloudflare.com/auth/callback",
+  "https://studios-avoiding-blame-secretary.trycloudflare.com/auth/shopify/callback",
+  "https://studios-avoiding-blame-secretary.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
