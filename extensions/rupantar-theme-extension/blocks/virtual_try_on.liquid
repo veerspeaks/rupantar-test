@@ -1,0 +1,445 @@
+<div id="virtualTryOnEmbedContainer" style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10000;">
+  <button id="virtualTryOnButton" class="custom-button" style="background-color: #000; transform: rotate(90deg); display: flex; align-items: center; justify-content: center; padding: 12px 24px;">
+    <span class="button-icon">✨</span>
+    <span class="button-text">Virtual Try On</span>
+  </button>
+</div>
+
+<!-- Modal Overlay (placed outside the fixed container so it centers correctly) -->
+<div id="virtualTryOnModal" class="modal-overlay hidden" style="z-index: 20000;">
+  <div class="modal-content">
+    <!-- Close Button -->
+    <button class="close-btn" id="closeModalButton">
+      <span class="close-icon">&times;</span>
+    </button>
+    
+    <!-- Intro Section -->
+    <div id="virtualTryOnIntro">
+      <div class="modal-header">
+        <h2 class="title-gradient">Virtual Try On Experience</h2>
+        <p class="intro-text">
+          Transform your shopping experience with our virtual fitting room!
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="steps-section">
+          <h3>How it works:</h3>
+          <ol class="steps-list">
+            <li><span class="step-number">1</span> Upload your photo</li>
+            <li><span class="step-number">2</span> Select your favorite style</li>
+            <li><span class="step-number">3</span> See yourself in the outfit!</li>
+          </ol>
+        </div>
+
+        <div class="tip-section">
+          <p class="fashion-tip">
+            <span class="tip-icon">✨</span>
+            <strong>Style Tip:</strong><br>
+            For the best results, upload a full-body photo in good lighting.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="start-btn" id="startVirtualTryOnBtn">
+          <span class="btn-icon">🎯</span>
+          Start Virtual Try-On
+        </button>
+      </div>
+    </div>
+
+    <!-- Product Info Section (hidden initially) -->
+    <div id="virtualTryOnProductInfo" class="hidden">
+      <!-- Optional: Loading Overlay (for demonstration) -->
+      <div class="loading-overlay hidden" id="loading-overlay">
+        <svg class="loading-spinner" width="80" height="80" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="20" fill="none" stroke-width="4" stroke="#007bff" />
+        </svg>
+        <h2>Shopping magic is on its way!</h2>
+        <p>Please don't close this window, we are getting things ready for you</p>
+      </div>
+      <!-- Product Info Content -->
+      <div class="product-info-content" id="product-info-content">
+        <div class="product-image">
+          {% if product %}
+            <img src="{{ product.images.first | img_url: 'large' }}"
+                 alt="{{ product.title }}"
+                 data-product-image="https:{{ product.images.first | img_url: 'large' }}"
+                 data-product-title="{{ product.title }}"
+                 data-product-type="{{ product.metafields.custom.type_of_cloth }}" />
+          {% else %}
+            <img src="https://via.placeholder.com/500x500?text=Demo+Image"
+                 alt="Demo Image"
+                 data-product-image="https://via.placeholder.com/500x500?text=Demo+Image"
+                 data-product-title="Demo Product"
+                 data-product-type="Demo Type" />
+          {% endif %}
+        </div>
+    
+        <div class="info-text" id="1st-p">
+          <h2>Your personal trial room</h2>
+          <p><strong>Try on your favourite styles in just 2 easy steps</strong></p>
+          <ol>
+            <li>Upload your fabulous picture</li>
+            <li>Check yourself out in the outfit!</li>
+          </ol>
+          
+          <p class="fashion-tip">
+            <strong>Fashion fairy tip ✨</strong><br>
+            For the best outfit preview, upload your photo in a similar clothing style that's over 2 MB.
+          </p>
+          
+          <div class="upload-section">
+            <div class="uploaded-image">
+              <!-- Image preview will be inserted here by JavaScript -->
+            </div>
+            <div class="upload-section-buttons">
+              <button class="upload-btn">Upload photo</button>
+              <button class="try-on-btn" disabled>Try on</button>
+            </div>
+            <!-- Hidden file input for photo upload -->
+            <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+          </div>
+        </div>
+    
+        <div class="info-text hidden" id="2nd-p">
+          <div class="nd-p-text">
+            <h2>Outfit Preview Ready!</h2>
+            <img src="https://cdn-icons-png.flaticon.com/512/2824/2824572.png" alt="Success Icon" class="success-icon">
+            <p>Woohoo!<br>You look like a star in this outfit</p>
+            <div class="button-container">
+              <button class="add-to-cart-btn" data-product-id="{{ product.variants[0].id }}">Add to cart</button>
+              <button class="new-image-btn">Use new image</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Button styles */
+.custom-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.custom-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+.button-icon {
+  font-size: 1.2em;
+}
+
+/* Modal overlay and content */
+.hidden {
+  display: none !important;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 1000px;
+  border-radius: 16px;
+  position: relative;
+  padding: 32px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 4px;
+}
+
+/* Intro section styles */
+.title-gradient {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 16px;
+  font-size: 24px;
+}
+.steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0;
+}
+.steps-list li {
+  position: relative;
+  padding-left: 40px;
+  margin: 16px 0;
+  line-height: 1.6;
+}
+.step-number {
+  position: absolute;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  background: #2563eb;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+.fashion-tip {
+  background-color: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 24px 0;
+}
+.start-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Info Component styles */
+.product-info-content {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+  min-height: 400px;
+  justify-content: center;
+  align-items: center;
+}
+.product-image {
+  flex: 1;
+  min-width: 300px;
+  max-width: 50%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.product-image img {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  border-radius: 12px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.product-image img:hover {
+  transform: scale(1.02);
+}
+.info-text {
+  flex: 1;
+  min-width: 300px;
+  max-width: 50%;
+  padding-right: 25px;
+}
+.info-text h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+.info-text p {
+  font-size: 16px;
+  color: #4a5568;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.upload-section {
+  margin-top: 25px;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.uploaded-image {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.upload-section-buttons button {
+  min-width: 130px;
+  padding: 14px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.upload-btn {
+  background-color: #2563eb;
+  color: white;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+.upload-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+.try-on-btn {
+  background-color: white;
+  color: #2563eb;
+  border: 2px solid #2563eb;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+.try-on-btn:hover:not(:disabled) {
+  background-color: #2563eb;
+  color: white;
+  transform: translateY(-1px);
+}
+.try-on-btn:disabled {
+  background-color: white;
+  color: #93c5fd;
+  border: 2px solid #93c5fd;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.add-to-cart-btn {
+  background-color: #059669;
+  color: white;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+.add-to-cart-btn:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+}
+.new-image-btn {
+  background-color: #64748b;
+  color: white;
+  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.2);
+}
+.new-image-btn:hover {
+  background-color: #475569;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(100, 116, 139, 0.3);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tryOnButton = document.getElementById('virtualTryOnButton');
+  const modal = document.getElementById('virtualTryOnModal');
+  const closeModalButton = document.getElementById('closeModalButton');
+  const startVirtualTryOnBtn = document.getElementById('startVirtualTryOnBtn');
+  const introSection = document.getElementById('virtualTryOnIntro');
+  const productInfoSection = document.getElementById('virtualTryOnProductInfo');
+
+  if (tryOnButton) {
+    tryOnButton.addEventListener('click', function() {
+      modal.classList.remove('hidden');
+    });
+  }
+
+  if (closeModalButton) {
+    closeModalButton.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      // Reset modal for next time
+      introSection.classList.remove('hidden');
+      productInfoSection.classList.add('hidden');
+    });
+  }
+
+  if (startVirtualTryOnBtn) {
+    startVirtualTryOnBtn.addEventListener('click', function() {
+      introSection.classList.add('hidden');
+      productInfoSection.classList.remove('hidden');
+      // Optionally initialize your upload/try-on functionality here:
+      if (typeof initializeUIElements === "function" && typeof setupEventListeners === "function") {
+        initializeUIElements();
+        setupEventListeners();
+      }
+    });
+  }
+
+  window.addEventListener('click', function(event) {
+    if (event.target === modal) {
+      modal.classList.add('hidden');
+      introSection.classList.remove('hidden');
+      productInfoSection.classList.add('hidden');
+    }
+  });
+
+  // Activate the upload photo feature
+  const uploadBtn = document.querySelector('.upload-btn');
+  const tryOnPhotoBtn = document.querySelector('.try-on-btn');
+  const photoUploadInput = document.getElementById('photoUploadInput');
+  const uploadedImageContainer = document.querySelector('.uploaded-image');
+
+  if (uploadBtn && photoUploadInput && uploadedImageContainer) {
+    uploadBtn.addEventListener('click', function() {
+      photoUploadInput.click();
+    });
+
+    photoUploadInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImageContainer.innerHTML = '<img src="' + e.target.result + '" alt="Uploaded photo" style="width: 100%; height: auto;" />';
+          // Enable the try-on button once a photo is uploaded
+          if (tryOnPhotoBtn) {
+            tryOnPhotoBtn.disabled = false;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "Virtual Try On",
+  "target": "body",
+  "settings": []
+}
+{% endschema %} 
