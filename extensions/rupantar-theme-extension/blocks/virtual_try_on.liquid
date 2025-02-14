@@ -1,5 +1,16 @@
-<div id="virtualTryOnEmbedContainer" style="position: fixed; {{ block.settings.button_position }}: {{ block.settings.button_distance }}px; top: {{ block.settings.button_offset }}%; transform: translateY(-50%); z-index: 10000;">
-  <button id="virtualTryOnButton" class="custom-button" style="background-color: {{ block.settings.button_color }}; color: {{ block.settings.button_text_color }}; width: {{ block.settings.button_width }}px; height: {{ block.settings.button_height }}px; padding: {{ block.settings.button_padding }}; font-size: {{ block.settings.button_font_size }}px; transform: {% if block.settings.button_position == 'left' or block.settings.button_position == 'right' %}rotate(90deg){% endif %}; display: flex; align-items: center; justify-content: center;">
+<div id="virtualTryOnEmbedContainer" class="{{ block.settings.container_class }}" style="position: {{ block.settings.position_type }}; {% if block.settings.position_type == 'fixed' %}{{ block.settings.button_position }}: {{ block.settings.button_distance }}px; top: {{ block.settings.button_offset }}%;{% endif %} transform: translateY(-50%); z-index: 10000; display: flex; {% if block.settings.alignment == 'start' %}justify-content: flex-start;{% elsif block.settings.alignment == 'end' %}justify-content: flex-end;{% else %}justify-content: center;{% endif %}">
+  <button id="virtualTryOnButton" 
+    class="custom-button" 
+    style="background-color: {{ block.settings.button_color }}; 
+           color: {{ block.settings.button_text_color }}; 
+           width: {{ block.settings.button_width }}px; 
+           height: {{ block.settings.button_height }}px; 
+           padding: {{ block.settings.button_padding }}; 
+           font-size: {{ block.settings.button_font_size }}px; 
+           transform: {% if block.settings.button_orientation == 'vertical' and block.settings.position_type == 'fixed' %}rotate(90deg){% endif %}; 
+           display: flex; 
+           align-items: center; 
+           justify-content: center;">
     <span class="button-icon">{{ block.settings.button_icon }}</span>
     <span class="button-text">{{ block.settings.button_text }}</span>
   </button>
@@ -586,113 +597,167 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const virtualTryOnButton = document.getElementById('virtualTryOnButton');
-  const modal = document.getElementById('virtualTryOnModal');
-  const closeModalButton = document.getElementById('closeModalButton');
-  const startVirtualTryOnBtn = document.getElementById('startVirtualTryOnBtn');
-  const welcomeModal = document.querySelector('.welcome-modal');
-  const guidelinesInterface1 = document.getElementById('guidelinesInterface1');
-  const guidelinesInterface2 = document.getElementById('guidelinesInterface2');
-  const guidelinesInterface3 = document.getElementById('guidelinesInterface3');
-  const tryOnInterface = document.getElementById('tryOnInterface');
-  const uploadPreview = document.getElementById('uploadPreview');
-  const photoUploadInput = document.getElementById('photoUploadInput');
-  const tryOnBtn = document.getElementById('tryOnBtn');
-  const closeTryOnButton = document.getElementById('closeTryOnButton');
+  document.addEventListener('DOMContentLoaded', function() {
+    // Original variable declarations
+    const virtualTryOnButton = document.getElementById('virtualTryOnButton');
+    const modal = document.getElementById('virtualTryOnModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+    const startVirtualTryOnBtn = document.getElementById('startVirtualTryOnBtn');
+    const welcomeModal = document.querySelector('.welcome-modal');
+    const guidelinesInterface1 = document.getElementById('guidelinesInterface1');
+    const guidelinesInterface2 = document.getElementById('guidelinesInterface2');
+    const guidelinesInterface3 = document.getElementById('guidelinesInterface3');
+    const tryOnInterface = document.getElementById('tryOnInterface');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const photoUploadInput = document.getElementById('photoUploadInput');
+    const tryOnBtn = document.getElementById('tryOnBtn');
+    const closeTryOnButton = document.getElementById('closeTryOnButton');
   
-  // Start virtual try-on (show first guidelines)
-  startVirtualTryOnBtn.addEventListener('click', () => {
-    welcomeModal.classList.add('hidden');
-    guidelinesInterface1.classList.remove('hidden');
-  });
-
-  // Guidelines navigation
-  document.getElementById('proceedToGuidelinesBtn2').addEventListener('click', () => {
-    guidelinesInterface1.classList.add('hidden');
-    guidelinesInterface2.classList.remove('hidden');
-  });
-
-  document.getElementById('proceedToGuidelinesBtn3').addEventListener('click', () => {
-    guidelinesInterface2.classList.add('hidden');
-    guidelinesInterface3.classList.remove('hidden');
-  });
-
-  document.getElementById('proceedToFinalBtn').addEventListener('click', () => {
-    guidelinesInterface3.classList.add('hidden');
-    tryOnInterface.classList.remove('hidden');
-  });
-
-  // Skip buttons
-  const skipToFinal = () => {
-    guidelinesInterface1.classList.add('hidden');
-    guidelinesInterface2.classList.add('hidden');
-    guidelinesInterface3.classList.add('hidden');
-    tryOnInterface.classList.remove('hidden');
-  };
-
-  document.getElementById('skipToFinalBtn1').addEventListener('click', skipToFinal);
-  document.getElementById('skipToFinalBtn2').addEventListener('click', skipToFinal);
-  document.getElementById('skipToFinalBtn3').addEventListener('click', skipToFinal);
-
-  // Open modal
-  virtualTryOnButton.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-  });
-
-  // Close modal buttons
-  const closeModal = () => {
-    modal.classList.add('hidden');
-    resetInterface();
-  };
-
-  closeModalButton.addEventListener('click', closeModal);
-  closeTryOnButton.addEventListener('click', closeModal);
-  document.getElementById('closeGuidelinesButton1').addEventListener('click', closeModal);
-  document.getElementById('closeGuidelinesButton2').addEventListener('click', closeModal);
-  document.getElementById('closeGuidelinesButton3').addEventListener('click', closeModal);
-
-  // Handle photo upload
-  uploadPreview.addEventListener('click', () => {
-    photoUploadInput.click();
-  });
-
-  photoUploadInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        uploadPreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-        tryOnBtn.disabled = false;
-      };
-      reader.readAsDataURL(file);
+    // New container selection function
+    function insertButtonIntoContainer() {
+      const containerSelector = "{{ block.settings.container_class }}";
+      const container = document.querySelector('.' + containerSelector) || document.querySelector('#' + containerSelector);
+      const virtualTryOnContainer = document.getElementById('virtualTryOnEmbedContainer');
+      
+      if (container && virtualTryOnContainer) {
+        // Remove any existing instances of the button
+        const existingContainer = container.querySelector('#virtualTryOnEmbedContainer');
+        if (existingContainer) {
+          existingContainer.remove();
+        }
+        
+        // Clone the container to avoid moving the original
+        const containerClone = virtualTryOnContainer.cloneNode(true);
+        
+        // Update styles for relative positioning
+        containerClone.style.position = 'relative';
+        containerClone.style.transform = 'none';
+        containerClone.style.top = 'auto';
+        containerClone.style.left = 'auto';
+        containerClone.style.right = 'auto';
+        containerClone.style.bottom = 'auto';
+        containerClone.style.margin = '10px 0';
+        
+        // Add the button to the specified container
+        container.appendChild(containerClone);
+        
+        // Reattach event listeners to the cloned button
+        const clonedButton = containerClone.querySelector('#virtualTryOnButton');
+        if (clonedButton) {
+          clonedButton.addEventListener('click', () => {
+            document.getElementById('virtualTryOnModal').classList.remove('hidden');
+          });
+        }
+        
+        // Remove the original floating button if it exists
+        if (virtualTryOnContainer.parentElement) {
+          virtualTryOnContainer.remove();
+        }
+      } else {
+        console.warn('Container not found: ' + containerSelector);
+      }
+    }
+  
+    // Call the insertion function
+    insertButtonIntoContainer();
+    
+    // Observer for dynamic content
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (!document.querySelector('#virtualTryOnButton')) {
+          insertButtonIntoContainer();
+        }
+      });
+    });
+  
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
+    // Original event listeners
+    startVirtualTryOnBtn.addEventListener('click', () => {
+      welcomeModal.classList.add('hidden');
+      guidelinesInterface1.classList.remove('hidden');
+    });
+  
+    document.getElementById('proceedToGuidelinesBtn2').addEventListener('click', () => {
+      guidelinesInterface1.classList.add('hidden');
+      guidelinesInterface2.classList.remove('hidden');
+    });
+  
+    document.getElementById('proceedToGuidelinesBtn3').addEventListener('click', () => {
+      guidelinesInterface2.classList.add('hidden');
+      guidelinesInterface3.classList.remove('hidden');
+    });
+  
+    document.getElementById('proceedToFinalBtn').addEventListener('click', () => {
+      guidelinesInterface3.classList.add('hidden');
+      tryOnInterface.classList.remove('hidden');
+    });
+  
+    const skipToFinal = () => {
+      guidelinesInterface1.classList.add('hidden');
+      guidelinesInterface2.classList.add('hidden');
+      guidelinesInterface3.classList.add('hidden');
+      tryOnInterface.classList.remove('hidden');
+    };
+  
+    document.getElementById('skipToFinalBtn1').addEventListener('click', skipToFinal);
+    document.getElementById('skipToFinalBtn2').addEventListener('click', skipToFinal);
+    document.getElementById('skipToFinalBtn3').addEventListener('click', skipToFinal);
+  
+    const closeModal = () => {
+      modal.classList.add('hidden');
+      resetInterface();
+    };
+  
+    closeModalButton.addEventListener('click', closeModal);
+    closeTryOnButton.addEventListener('click', closeModal);
+    document.getElementById('closeGuidelinesButton1').addEventListener('click', closeModal);
+    document.getElementById('closeGuidelinesButton2').addEventListener('click', closeModal);
+    document.getElementById('closeGuidelinesButton3').addEventListener('click', closeModal);
+  
+    uploadPreview.addEventListener('click', () => {
+      photoUploadInput.click();
+    });
+  
+    photoUploadInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadPreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+          tryOnBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+  
+    function resetInterface() {
+      welcomeModal.classList.remove('hidden');
+      guidelinesInterface1.classList.add('hidden');
+      guidelinesInterface2.classList.add('hidden');
+      guidelinesInterface3.classList.add('hidden');
+      tryOnInterface.classList.add('hidden');
+      uploadPreview.innerHTML = `<div class="upload-icon">⬆️</div>`;
+      tryOnBtn.disabled = true;
     }
   });
+  </script>
 
-  // Close modal when clicking outside
-  modal.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
-  });
-
-  // Reset interface function update
-  function resetInterface() {
-    welcomeModal.classList.remove('hidden');
-    guidelinesInterface1.classList.add('hidden');
-    guidelinesInterface2.classList.add('hidden');
-    guidelinesInterface3.classList.add('hidden');
-    tryOnInterface.classList.add('hidden');
-    uploadPreview.innerHTML = `<div class="upload-icon">⬆️</div>`;
-    tryOnBtn.disabled = true;
-  }
-});
-</script>
 
 {% schema %}
 {
   "name": "Virtual Try On",
-  "target": "body", 
+  "target": "body",
+  "templates": ["product"],
   "settings": [
     {
       "type": "text",
@@ -702,26 +767,73 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     {
       "type": "text",
-      "id": "button_icon", 
+      "id": "button_icon",
       "label": "Button Icon",
       "default": "✨"
     },
     {
-      "type": "color",
-      "id": "button_color",
-      "label": "Button Background Color",
-      "default": "#000000"
+      "type": "select",
+      "id": "position_type",
+      "label": "Position Type",
+      "options": [
+        {
+          "value": "fixed",
+          "label": "Fixed Position"
+        },
+        {
+          "value": "relative",
+          "label": "Relative to Container"
+        }
+      ],
+      "default": "fixed"
     },
     {
-      "type": "color",
-      "id": "button_text_color",
-      "label": "Button Text Color", 
-      "default": "#ffffff"
+      "type": "text",
+      "id": "container_class",
+      "label": "Container Selector",
+      "info": "Enter the class or ID of the container where you want to place the button",
+      "default": "product-form"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Button Alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "Start"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "End"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "button_orientation",
+      "label": "Button Orientation",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "Horizontal"
+        },
+        {
+          "value": "vertical",
+          "label": "Vertical"
+        }
+      ],
+      "default": "horizontal"
     },
     {
       "type": "select",
       "id": "button_position",
-      "label": "Button Position",
+      "label": "Fixed Button Position",
       "options": [
         {
           "value": "top",
