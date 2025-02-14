@@ -1,7 +1,7 @@
-<div id="virtualTryOnEmbedContainer" style="position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10000;">
-  <button id="virtualTryOnButton" class="custom-button" style="background-color: #000; transform: rotate(90deg); display: flex; align-items: center; justify-center: center; padding: 12px 24px;">
-    <span class="button-icon">✨</span>
-    <span class="button-text">Virtual Try On</span>
+<div id="virtualTryOnEmbedContainer" style="position: fixed; {{ block.settings.button_position }}: {{ block.settings.button_distance }}px; top: {{ block.settings.button_offset }}%; transform: translateY(-50%); z-index: 10000;">
+  <button id="virtualTryOnButton" class="custom-button" style="background-color: {{ block.settings.button_color }}; color: {{ block.settings.button_text_color }}; width: {{ block.settings.button_width }}px; height: {{ block.settings.button_height }}px; padding: {{ block.settings.button_padding }}; font-size: {{ block.settings.button_font_size }}px; transform: {% if block.settings.button_position == 'left' or block.settings.button_position == 'right' %}rotate(90deg){% endif %}; display: flex; align-items: center; justify-content: center;">
+    <span class="button-icon">{{ block.settings.button_icon }}</span>
+    <span class="button-text">{{ block.settings.button_text }}</span>
   </button>
 </div>
 
@@ -16,22 +16,26 @@
     <div class="welcome-container">
       <!-- Product Image Section -->
       <div class="product-image">
-        {% if product %}
+        {% if product.featured_image %}
           <img src="{{ product.featured_image | img_url: 'large' }}"
                alt="{{ product.title }}"
+               width="460"
+               height="560"
                class="product-preview" />
         {% else %}
           <img src="https://via.placeholder.com/500x800?text=Product+Image"
                alt="Demo Product"
+               width="460" 
+               height="560"
                class="product-preview" />
         {% endif %}
       </div>
 
       <!-- Welcome Text Section -->
       <div class="welcome-text">
-        <h1>Welcome<br>to the<br>Virtual Trial Room!</h1>
-        <button class="try-outfit-btn" id="startVirtualTryOnBtn">
-          Try this outfit
+        <h1>{{ block.settings.welcome_heading }}</h1>
+        <button class="try-outfit-btn" id="startVirtualTryOnBtn" style="background-color: {{ block.settings.cta_button_color }};">
+          {{ block.settings.cta_button_text }}
         </button>
       </div>
     </div>
@@ -49,11 +53,15 @@
     </button>
 
     <div class="guidelines-container">
-      <h2 class="guidelines-title">Use a front profile, SOLO image</h2>
+      <h2 class="guidelines-title">{{ block.settings.guideline1_heading | default: 'Use a front profile, SOLO image' }}</h2>
       
       <div class="guidelines-examples">
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/ef27/c7ff/71bc43a6d846ea4c112a0c28db962f59?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=d8hdkQ7hX8qrEH6-e03tsqFqADZT3EJdnugIjrBS7NZsRUXiQV3WhIr1icpgpsgqbULflvA3nOaTIUs2JF9wocKGlk0fYWSca0n7pmkhz8bUHj1JnsSRSi-1e7bPL2i6cFChLJSETP6uCPvLQAeinlBUFRTSW18K8IxMdBK8A9vPHm2ssI7YqKEWk7AcLaFSiUbTVCE-a3-sMpbOgdatmIkQ9qlzTqK4BI~QbbjaJJ8U7~dPOhuf1PKu5IY~tk5rzN9hMoXnw3uieqkJlq07RoWnTJ0pM-dBf~h7IKtJ9zwWMob8uG0KlprXDl09G-6ZWCjoow73AzZCgBSmCuMEtg__" alt="Wrong example" class="example-image">
+          <img src="{{ block.settings.guideline1_wrong_image | default: 'https://s3-alpha-sig.figma.com/img/ef27/c7ff/71bc43a6d846ea4c112a0c28db962f59?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=d8hdkQ7hX8qrEH6-e03tsqFqADZT3EJdnugIjrBS7NZsRUXiQV3WhIr1icpgpsgqbULflvA3nOaTIUs2JF9wocKGlk0fYWSca0n7pmkhz8bUHj1JnsSRSi-1e7bPL2i6cFChLJSETP6uCPvLQAeinlBUFRTSW18K8IxMdBK8A9vPHm2ssI7YqKEWk7AcLaFSiUbTVCE-a3-sMpbOgdatmIkQ9qlzTqK4BI~QbbjaJJ8U7~dPOhuf1PKu5IY~tk5rzN9hMoXnw3uieqkJlq07RoWnTJ0pM-dBf~h7IKtJ9zwWMob8uG0KlprXDl09G-6ZWCjoow73AzZCgBSmCuMEtg__' }}" 
+               alt="Wrong example" 
+               width="300"
+               height="300"
+               class="example-image">
           <div class="example-overlay wrong">
             <svg class="wrong-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M18 6L6 18M6 6l12 12" stroke="red" stroke-width="2" fill="none"/>
@@ -62,7 +70,11 @@
         </div>
         
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__" alt="Correct example" class="example-image">
+          <img src="{{ block.settings.guideline1_correct_image | default: 'https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__' }}" 
+               alt="Correct example"
+               width="300"
+               height="300" 
+               class="example-image">
           <div class="example-overlay correct">
             <svg class="correct-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M20 6L9 17l-5-5" stroke="green" stroke-width="2" fill="none"/>
@@ -72,7 +84,7 @@
       </div>
 
       <div class="guidelines-buttons">
-        <button class="next-btn" id="proceedToGuidelinesBtn2">Next</button>
+        <button class="next-btn" id="proceedToGuidelinesBtn2" style="background-color: {{ block.settings.next_button_color | default: '#2563eb' }};">Next</button>
         <button class="skip-btn" id="skipToFinalBtn1">Skip</button>
       </div>
     </div>
@@ -89,11 +101,15 @@
     </button>
 
     <div class="guidelines-container">
-      <h2 class="guidelines-title">Use a clear CLOSE-UP image</h2>
+      <h2 class="guidelines-title">{{ block.settings.guideline2_heading | default: 'Use a clear CLOSE-UP image' }}</h2>
       
       <div class="guidelines-examples">
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/2ae1/4f9c/ba5b9fb07c73177fa94a63222db1c998?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=fXBBgcOOxqwh3sfz0AdMHzoj2QuGe04BHZhyo46jRa5wLgYdUd3XH6IGq-FIJyRRikSfStnUX2Cqv-zWj86yb~NxKinRt4J4rWks5yZCgX2Kot9OtbZNebwa4RIZ-AqdhqnGTFBN5uPBJSRNrgH60BvYHSLL04wl955GxdoeM26rj1BEyaS8JtTeVBA3tkV3PtVCGkSozdgmyGrMqZ4vsUyyoZoJoYMoq82Lm8f7wcBbp6N10JoR2qKrHQh-eqbhLTOAAt2a3fDinMNh8IR7iGEKxpJhjhw7lHO2dPWW1Obi9DkheB3~qfDf-Go8cAMa2YF8aDS8l3-gqN~GvRERiw__" alt="Wrong example" class="example-image">
+          <img src="{{ block.settings.guideline2_wrong_image | default: 'https://s3-alpha-sig.figma.com/img/2ae1/4f9c/ba5b9fb07c73177fa94a63222db1c998?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=fXBBgcOOxqwh3sfz0AdMHzoj2QuGe04BHZhyo46jRa5wLgYdUd3XH6IGq-FIJyRRikSfStnUX2Cqv-zWj86yb~NxKinRt4J4rWks5yZCgX2Kot9OtbZNebwa4RIZ-AqdhqnGTFBN5uPBJSRNrgH60BvYHSLL04wl955GxdoeM26rj1BEyaS8JtTeVBA3tkV3PtVCGkSozdgmyGrMqZ4vsUyyoZoJoYMoq82Lm8f7wcBbp6N10JoR2qKrHQh-eqbhLTOAAt2a3fDinMNh8IR7iGEKxpJhjhw7lHO2dPWW1Obi9DkheB3~qfDf-Go8cAMa2YF8aDS8l3-gqN~GvRERiw__' }}" 
+               alt="Wrong example"
+               width="300"
+               height="300"
+               class="example-image">
           <div class="example-overlay wrong">
             <svg class="wrong-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M18 6L6 18M6 6l12 12" stroke="red" stroke-width="2" fill="none"/>
@@ -102,7 +118,11 @@
         </div>
         
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__" alt="Correct example" class="example-image">
+          <img src="{{ block.settings.guideline2_correct_image | default: 'https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__' }}" 
+               alt="Correct example"
+               width="300"
+               height="300"
+               class="example-image">
           <div class="example-overlay correct">
             <svg class="correct-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M20 6L9 17l-5-5" stroke="green" stroke-width="2" fill="none"/>
@@ -112,7 +132,7 @@
       </div>
 
       <div class="guidelines-buttons">
-        <button class="next-btn" id="proceedToGuidelinesBtn3">Next</button>
+        <button class="next-btn" id="proceedToGuidelinesBtn3" style="background-color: {{ block.settings.next_button_color | default: '#2563eb' }};">Next</button>
         <button class="skip-btn" id="skipToFinalBtn2">Skip</button>
       </div>
     </div>
@@ -129,11 +149,15 @@
     </button>
 
     <div class="guidelines-container">
-      <h2 class="guidelines-title">Use a GOOD QUALITY image</h2>
+      <h2 class="guidelines-title">{{ block.settings.guideline3_heading | default: 'Use a GOOD QUALITY image' }}</h2>
       
       <div class="guidelines-examples">
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/3e8f/b308/956cd556da53ce583492a9dfe6dbf28e?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qG38O5Gop7nt2LgoP77lMum7uNT9Jh0AENuJZePuo6~RsshNPifIeM4Jk64Uxu7mh2mqAaYKJ~fFS0CJVO0WmW05d5z7LNOUv1DekxRe8p-MPTjZ8bERiAqn2UPlroEQiETVd0-hlaNZTNGWYwsrnyPkZ7EGoFW2-fYhMKD-OheQrvKRcH8dfdpqiBIDGZ6bx9-A4hggPX7yWz~kawUf9QO7Q-Z7ZUlprbXnIH7ud6ZFfK1d20sBOVcXvMC9JVWPvZc2RdjLGnNYujqhdqC1xybxvBjli-VIxc3kb9N5ZyRQ9xjGPVtv96eSfnOZPvrv8EBH8zrctk1NtBJLjXfLsQ__" alt="Wrong example" class="example-image">
+          <img src="{{ block.settings.guideline3_wrong_image | default: 'https://s3-alpha-sig.figma.com/img/3e8f/b308/956cd556da53ce583492a9dfe6dbf28e?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=qG38O5Gop7nt2LgoP77lMum7uNT9Jh0AENuJZePuo6~RsshNPifIeM4Jk64Uxu7mh2mqAaYKJ~fFS0CJVO0WmW05d5z7LNOUv1DekxRe8p-MPTjZ8bERiAqn2UPlroEQiETVd0-hlaNZTNGWYwsrnyPkZ7EGoFW2-fYhMKD-OheQrvKRcH8dfdpqiBIDGZ6bx9-A4hggPX7yWz~kawUf9QO7Q-Z7ZUlprbXnIH7ud6ZFfK1d20sBOVcXvMC9JVWPvZc2RdjLGnNYujqhdqC1xybxvBjli-VIxc3kb9N5ZyRQ9xjGPVtv96eSfnOZPvrv8EBH8zrctk1NtBJLjXfLsQ__' }}" 
+               alt="Wrong example"
+               width="300"
+               height="300"
+               class="example-image">
           <div class="example-overlay wrong">
             <svg class="wrong-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M18 6L6 18M6 6l12 12" stroke="red" stroke-width="2" fill="none"/>
@@ -142,7 +166,11 @@
         </div>
         
         <div class="example-box">
-          <img src="https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__" alt="Correct example" class="example-image">
+          <img src="{{ block.settings.guideline3_correct_image | default: 'https://s3-alpha-sig.figma.com/img/82bf/bd9e/ff8e8a260315f84239667ae3669020cf?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=q2wxB-g5ZhNPelVaXd1Xv9EfUoliSD0-f0UkXGVsk9luTxwRej-WMUfUGqRdGqENcslAkL1fcxp~etAmmVEfMBNMqoeGAS~g7Nub4vaa3tbHP7XU-HIDS0W~v1IiB3GBZZ-M-dQtCYLSoX-0iVEkTRUk4Xctvrc57tFwTDp-hK72vTi39TzlKc6tYDW9AbGvSBuuGC9t0mPXnGBtP96vX6l9J7-lZTLrhBeMkYNd3jkNJVz0dHaEFob88LafgqpvhTzd2Z23lLefwzC8lf4Idlufx8vtxPCgQCx5~QeqinBdnxmIu0JjqUXgSz2XYImEf8KrwlD7Q90E1TdwVes-1A__' }}" 
+               alt="Correct example"
+               width="300"
+               height="300"
+               class="example-image">
           <div class="example-overlay correct">
             <svg class="correct-icon" viewBox="0 0 24 24" width="64" height="64">
               <path d="M20 6L9 17l-5-5" stroke="green" stroke-width="2" fill="none"/>
@@ -152,7 +180,7 @@
       </div>
 
       <div class="guidelines-buttons">
-        <button class="next-btn" id="proceedToFinalBtn">Next</button>
+        <button class="next-btn" id="proceedToFinalBtn" style="background-color: {{ block.settings.next_button_color | default: '#2563eb' }};">Next</button>
         <button class="skip-btn" id="skipToFinalBtn3">Skip</button>
       </div>
     </div>
@@ -170,19 +198,23 @@
     
     <div class="welcome-container">
       <div class="product-image">
-        {% if product %}
+        {% if product.featured_image %}
           <img src="{{ product.featured_image | img_url: 'large' }}"
                alt="{{ product.title }}"
+               width="460"
+               height="560"
                class="product-preview" />
         {% else %}
           <img src="https://via.placeholder.com/500x600?text=Product+Image"
                alt="Demo Product"
+               width="460"
+               height="560"
                class="product-preview" />
         {% endif %}
       </div>
       
       <div class="upload-side">
-        <h2 class="product-title">You are trying LOREM IPSUM<br>DOLOR SIT AMET</h2>
+        <h2 class="product-title">{{ block.settings.try_on_heading | default: 'You are trying LOREM IPSUM<br>DOLOR SIT AMET' }}</h2>
         
         <div class="upload-section">
           <div class="upload-preview-container">
@@ -193,11 +225,11 @@
           
           <div class="action-buttons">
             <input type="file" id="photoUploadInput" accept="image/*" class="hidden">
-            <button class="upload-btn" onclick="document.getElementById('photoUploadInput').click()">
-              Upload photo
+            <button class="upload-btn" onclick="document.getElementById('photoUploadInput').click()" style="background-color: {{ block.settings.upload_button_color | default: '#2563eb' }};">
+              {{ block.settings.upload_button_text | default: 'Upload photo' }}
             </button>
-            <button class="try-on-btn" id="tryOnBtn" disabled>
-              Try on
+            <button class="try-on-btn" id="tryOnBtn" disabled style="border-color: {{ block.settings.try_on_button_color | default: '#2563eb' }}; color: {{ block.settings.try_on_button_color | default: '#2563eb' }};">
+              {{ block.settings.try_on_button_text | default: 'Try on' }}
             </button>
           </div>
         </div>
@@ -660,7 +692,130 @@ document.addEventListener('DOMContentLoaded', function() {
 {% schema %}
 {
   "name": "Virtual Try On",
-  "target": "body",
-  "settings": []
+  "target": "body", 
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Virtual Try On"
+    },
+    {
+      "type": "text",
+      "id": "button_icon", 
+      "label": "Button Icon",
+      "default": "✨"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color", 
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "button_position",
+      "label": "Button Position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "button_offset",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Button Position Offset",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "button_distance",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Distance from Edge",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_width",
+      "min": 100,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Button Width",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "button_height",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Button Height",
+      "default": 40
+    },
+    {
+      "type": "text",
+      "id": "button_padding",
+      "label": "Button Padding",
+      "default": "12px 24px"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Button Font Size",
+      "default": 16
+    },
+    {
+      "type": "text",
+      "id": "welcome_heading",
+      "label": "Welcome Heading",
+      "default": "Welcome<br>to the<br>Virtual Trial Room!"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_text",
+      "label": "CTA Button Text",
+      "default": "Try this outfit"
+    },
+    {
+      "type": "color",
+      "id": "cta_button_color",
+      "label": "CTA Button Color",
+      "default": "#2563eb"
+    }
+  ]
 }
 {% endschema %}
